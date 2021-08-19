@@ -144,6 +144,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="player.frag" />
+    <None Include="player.vec" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="helper.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

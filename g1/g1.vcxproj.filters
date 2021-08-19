@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\shaders">
+      <UniqueIdentifier>{d5381615-a97b-4f38-acf9-e9dfe8917928}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -21,5 +24,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="player.vec">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="player.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="helper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

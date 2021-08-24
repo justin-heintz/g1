@@ -30,10 +30,16 @@
     <None Include="player.frag">
       <Filter>Resource Files\shaders</Filter>
     </None>
+    <None Include="ttf.vec">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="ttf.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="helper.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="shader2.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

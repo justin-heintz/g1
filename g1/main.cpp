@@ -75,6 +75,8 @@ unsigned int EBO;
 unsigned int VAOF, VBOF;
 unsigned int texture;
 
+float color = 0.0f;
+float sizer = 0.0f;
 struct Character {
 	unsigned int TextureID; // ID handle of the glyph texture
 	glm::ivec2   Size;      // Size of glyph
@@ -262,14 +264,13 @@ void normalKeysFunc(unsigned char key, int x, int y) {
 	events.push_back(ev);
 }
 void draw() {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
 	//shaders[0]->setVec4("flagColorTwo", glm::vec4(1.0f, 0.5f, 0.2f, opacity));
 	//shaders[0]->use();
 
-	RenderText(*shaders[0], "Terrible Tutorial", 250.0f, 500.0f, 0.4f, glm::vec3(0.0, 0.8f, 0.2f));
-
+	RenderText(*shaders[0], "Terrible Tutorial", 250.0f, 500.0f, sizer, glm::vec3(color, 0.8f, 0.2f));
 	RenderText(*shaders[0], "Sample Shit", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
 
 	glBindVertexArray(VAO);
@@ -295,7 +296,8 @@ void update(int) {
 		e = 0;
 		//cout << s;
 	}
-
+	color += 0.005;
+	sizer += 0.005;
 	for (int i = 0; i < events.size(); i++) {
 		if (events[i].type == 1) {
 

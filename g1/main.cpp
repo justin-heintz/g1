@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <ctime>
+#include <cstdlib>
 
 #include <map>
 
@@ -20,63 +21,26 @@
 #include FT_FREETYPE_H  
 
 using namespace std;
-
-float txtMove = 0.1;
-int e = 0;
+ 
 float timer = 60;
 float opacity = 1.0f;
-class event {
-public:
-	int type = 0;//0 = idle, 1 = keyboard, 2 =  mouse
-	int button = 0;// 0 = no button
-	int buttonState = 0;
-	int position[2] = { 0, 0 }; //X,Y
-	int special = 0;
-	char key;
-	event(int intType) {
-		type = intType;
-	}
-
-};
-class entity {
-public:
-	int moveSpeed = 2;
-	int position[3]{ 0, 0 ,0 }; //X,Y,Z
-	float pos[24]{
-		// positions--colors
-		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   // top right
-		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   // bottom right
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  // bottom left
-		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,  // top left 
-	};
-	void setPosX(float x) {
-		position[0] = x;
-		pos[0]  = pos[0] + x;
-		pos[6]  = pos[6] + x;
-		pos[12] = pos[12] + x;
-		pos[18] = pos[18] + x;
-	}
-	void setPosY(float y) { position[1] = y; 
-		pos[1] = pos[1] + y;
-		pos[7] = pos[7] + y;
-		pos[13] = pos[13] + y;
-		pos[19] = pos[19] + y;
-	}
-};
 
 enum eTypes { CLICK, KEYPRESS, MOVE, REMOVE, CREATE, ATTACK, SPAWN };
-vector<event> events;
-vector<entity> entities;
+
 vector<Shader*> shaders;
-unsigned int VBO;
-unsigned int VAO;
-unsigned int EBO;
+ 
 
 unsigned int VAOF, VBOF;
 unsigned int texture;
 
 float color = 0.0f;
 float sizer = 0.0f;
+float x = 0;
+float y = 0;
+int mx = 0;
+int my = 0;
+triangle a;
+glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(600), 0.0f, static_cast<float>(600));
 struct Character {
 	unsigned int TextureID; // ID handle of the glyph texture
 	glm::ivec2   Size;      // Size of glyph
@@ -87,7 +51,6 @@ struct Character {
 std::map<GLchar, Character> Characters;
 FT_Face face;
 FT_Library ft;
-
  
 void RenderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color){
 	// activate corresponding render state	
@@ -132,8 +95,11 @@ void RenderText(Shader& s, std::string text, float x, float y, float scale, glm:
 }
 
 void initGame() {
+	srand(static_cast <unsigned> (time(0)));
+	 x = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 250));
+	 y = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 10));
 	//START OF TEXT
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -151,39 +117,19 @@ void initGame() {
 	if (FT_Load_Char(face, 'X', FT_LOAD_RENDER)){
 		std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
 	}
+	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
 
 	for (unsigned char c = 0; c < 128; c++)	{
 		// load character glyph 
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER))		{
 			std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
-			continue;
 		}
+
 		// generate texture
-		
 		glGenTextures(1, &texture);
 		glBindTexture(GL_TEXTURE_2D, texture);
-		/* void glTexImage2D(
-			GLenum target,
-			GLint level,
-			GLint internalformat,
-			GLsizei width,
-			GLsizei height,
-			GLint border,
-			GLenum format,
-			GLenum type,
-			const void* data);*/
-		glTexImage2D(
-			GL_TEXTURE_2D,
-			0,
-			GL_RED,
-			face->glyph->bitmap.width,
-			face->glyph->bitmap.rows,
-			0,
-			GL_RED,
-			GL_UNSIGNED_BYTE,
-			face->glyph->bitmap.buffer
-		);
+		glTexImage2D( GL_TEXTURE_2D, 0, GL_RED, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer );
 
 		// set texture options
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -205,7 +151,6 @@ void initGame() {
 	FT_Done_Face(face);
 	FT_Done_FreeType(ft);
 
-
 	glGenVertexArrays(1, &VAOF);
 	glGenBuffers(1, &VBOF);
 	glBindVertexArray(VAOF);
@@ -218,118 +163,75 @@ void initGame() {
 	//END OF TEXT
 
 	shaders.push_back(new Shader("./ttf.vec", "./ttf.frag"));
-	//shaders.push_back(new Shader("./player.vec", "./player.frag"));
+	shaders.push_back(new Shader("./player.vec", "./player.frag"));
 
-	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(600), 0.0f, static_cast<float>(600));
+	//glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(600), 0.0f, static_cast<float>(600));
+	
 	shaders[0]->use();
 	glUniformMatrix4fv(glGetUniformLocation(shaders[0]->ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-
-
-	entity player;
-	entities.push_back(player);
-	entities[0].pos;
-
-	unsigned int indices[] = {  // note that we start from 0!
+	vector<float> b  = {
+		 0.5f,  0.5f, 0.0f,  // top right
+		 0.5f, -0.5f, 0.0f,  // bottom right
+		-0.5f, -0.5f, 0.0f,  // bottom left
+		-0.5f,  0.5f, 0.0f   // top left 
+	};
+	vector<unsigned int> c = {  // note that we start from 0!
 		0, 1, 3,  // first Triangle
 		1, 2, 3   // second Triangle
 	};
-
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(entities[0].pos), entities[0].pos , GL_STATIC_DRAW);
 	
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
+	a.create(b,c);
 }
-void mouseFunc(int button, int state, int x, int y) {
-	event ev(2);
-	ev.button = button;
-	ev.buttonState = state;
-	ev.position[0] = x;
-	ev.position[1] = y;
-	events.push_back(ev);
-}
-void normalKeysFunc(unsigned char key, int x, int y) {
-	event ev(1);
-	ev.key = key;
-	events.push_back(ev);
-}
+void mouseFunc(int button, int state, int x, int y) {}
+void normalKeysFunc(unsigned char key, int x, int y) {}
 void draw() {
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	 
+	bool dirx, diry;
+	if (mx == 0) { x = x + 4; }else { x = x - 4; }
+	if (my == 0) { y = y + 4; }	else { y = y - 4; }
 
 
-	//shaders[0]->setVec4("flagColorTwo", glm::vec4(1.0f, 0.5f, 0.2f, opacity));
-	//shaders[0]->use();
+ 
+	//shaders[1]->setVec4("flagColorTwo", glm::vec4(1.0f, 1.0f, 0.2f, 1.0f));
+	//glUniformMatrix4fv(glGetUniformLocation(shaders[1]->ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-	RenderText(*shaders[0], "Terrible Tutorial", 250.0f, 500.0f, sizer, glm::vec3(color, 0.8f, 0.2f));
-	RenderText(*shaders[0], "Sample Shit", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
-
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	shaders[1]->use();
+	//shaders[1]->setVec4("flagColorTwo", glm::vec4(1.0f, 1.0f, 0.2f, 1.0f));
 	
+	a.setVAO(); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+	 //glDrawArrays(GL_TRIANGLES, 0, 6);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	RenderText(*shaders[0], "ANGERY!", x, y, sizer, glm::vec3(color, 0, 0));
+	RenderText(*shaders[0], "Sample crap", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+
+	//a.setVAO();
+	//a.setEBO();
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, a.EBO);
+	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	//glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	glLoadIdentity();
 	glutSwapBuffers();
 }
 void update(int) {
-
 	glutPostRedisplay();
-	txtMove += 1;
-	e++;
+ 
+	//x = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 600));
+	//y = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 600));
+	mx = static_cast <int>  (rand()) / (static_cast <int> (RAND_MAX / 2));
+	my = static_cast <int>  (rand()) / (static_cast <int> (RAND_MAX / 2));
 
-	char s[50];
-	time_t  t = time(NULL);
-	ctime_s(s, 50, &t);
-
-	if (e >= timer) {
-		e = 0;
-		//cout << s;
-	}
 	color += 0.005;
 	sizer += 0.005;
-	for (int i = 0; i < events.size(); i++) {
-		if (events[i].type == 1) {
-
-			if (events[i].key == 'w') {
-				opacity += 0.01f;
-				entities[0].setPosY(entities[0].position[1] + entities[0].moveSpeed);
-				cout << "FOWARD " << entities[0].position[1] << "\n";
-			}
-			else if (events[i].key == 'a') {
-				entities[0].setPosX(entities[0].position[0] - entities[0].moveSpeed);
-				cout << "LEFT " << entities[0].position[0] << "\n";
-			}
-			else if (events[i].key == 's') {
-				opacity -= 0.01f;
-				entities[0].setPosY(entities[0].position[1] - entities[0].moveSpeed);
-				cout << "DOWN " << entities[0].position[1] << "\n";
-			}
-			else if (events[i].key == 'd') {
-				entities[0].setPosX(entities[0].position[0] + entities[0].moveSpeed);
-				cout << "RIGHT " << entities[0].position[0] << "\n";
-			}
-
-		}
-		else if (events[i].type == 2) {
-			cout << events[i].button << " - " << events[i].buttonState << "\n";
-		}
-		events.erase(events.begin());
-	}
-	events;//remove this is for testing
 
 	glutTimerFunc(1000.0 / timer, update, 0);
 }
+
 void main(int argc, char** argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
@@ -337,10 +239,9 @@ void main(int argc, char** argv) {
 	glutInitWindowPosition(0, 0);
 	glutCreateWindow("G1");
  	glViewport(0, 0, 600, 600);
-	glMatrixMode(GL_PROJECTION);
-	//glOrtho(0, 600, 0, 600, -1, 1);//left right bottom top nearz farz
-	glm::mat4 projection = glm::ortho(0.0f, 600.0f, 0.0f, 600.0f);//left right bottom top
-	glMatrixMode(GL_MODELVIEW);
+//	glMatrixMode(GL_PROJECTION);
+	//glm::mat4 projection = glm::ortho(0.0f, 600.0f, 0.0f, 600.0f);//left right bottom top
+	//glMatrixMode(GL_MODELVIEW);
 
 	glewInit();
 	initGame();

@@ -36,6 +36,12 @@
     <None Include="ttf.frag">
       <Filter>Resource Files\shaders</Filter>
     </None>
+    <None Include="block.vec">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="block.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shader2.h">

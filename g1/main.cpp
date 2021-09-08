@@ -77,7 +77,7 @@ void main(int argc, char** argv) {
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(600, 600);
 	glutInitWindowPosition(0, 0);
-	glutCreateWindow("G1");
+	glutCreateWindow("G1"); 
  	glViewport(0, 0, 600, 600);
  
 	glewInit(); 

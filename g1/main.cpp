@@ -67,7 +67,7 @@ void draw() {
 
 	glLoadIdentity();
 	glutSwapBuffers();
-}
+} 
 void update(int) {
 	glutPostRedisplay();
 	glutTimerFunc(1000.0 / timer, update, 0);

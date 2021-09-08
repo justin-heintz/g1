@@ -25,7 +25,6 @@ using namespace std;
 float timer = 60;
 float opacity = 1.0f;
 
-
 vector<Shader*> shaders;
  
 unsigned int VAOF, VBOF;
@@ -95,10 +94,17 @@ void RenderText(Shader& s, std::string text, float x, float y, float scale, glm:
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
-
 void initGame() {
-	//GLint m_viewport[4];
-	//glGetIntegerv(GL_VIEWPORT, m_viewport);
+	glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+	glm::mat4 trans = glm::mat4(1.0f);
+	trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+	vec = trans * vec;
+	std::cout << vec.x << vec.y << vec.z << std::endl;
+
+	glm::mat4 transtwo = glm::mat4(1.0f);
+	transtwo = glm::rotate(transtwo, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+	transtwo = glm::scale(transtwo, glm::vec3(0.5, 0.5, 0.5));
+
 
 	srand(static_cast <unsigned> (time(0)));
 	 x = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 250));
@@ -212,6 +218,7 @@ void draw() {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	
 	shaders[1]->use();
 	glUniformMatrix4fv(glGetUniformLocation(shaders[1]->ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	shaders[1]->setVec4("color", glm::vec4(1.0f, 1.0f, 0.2f, 1.0f));
@@ -230,6 +237,7 @@ void draw() {
 	g.setVAO();
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	*/
+	
 	shaders[0]->use();
 	glUniformMatrix4fv(glGetUniformLocation(shaders[0]->ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	RenderText(*shaders[0], "ANGERY!", x, y, sizer, glm::vec3(color, 0, 0));
@@ -255,7 +263,6 @@ void update(int) {
 
 	glutTimerFunc(1000.0 / timer, update, 0);
 }
-
 void main(int argc, char** argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);

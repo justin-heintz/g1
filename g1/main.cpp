@@ -16,7 +16,7 @@
 #include "shader2.h"
 
 using namespace std;
-
+//https://learnopengl.com/Getting-started/Hello-Triangle
 
 vector<Shader*> shaders;
 float z = -3.0f;
@@ -26,6 +26,7 @@ float timer = 60;
 float rotater = 0.0f;
 drawOBJ element1;
 drawOBJ element2;
+drawOBJ element3;
 vector<float> vecs = {
    -0.5f, -0.5f, -0.5f,
      0.5f, -0.5f, -0.5f,
@@ -42,26 +43,21 @@ vector<float> vecs = {
     -0.5f, -0.5f,  0.5f 
 };
 vector<float> vecs2 = {
-
-
-    -0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f,  0.5f,
-     0.5f, -0.5f,  0.5f,
-    -0.5f, -0.5f,  0.5f,
-    -0.5f, -0.5f, -0.5f,
-
-    -0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, 1.0f,  // top right
+     0.5f, -0.5f, 1.0f,  // bottom right
+    -0.5f, -0.5f, 1.0f,  // bottom left
+   
 };
+vector<float> vecs3 = {
+    0.15f, 0.15f, -1.0f,  // top right
+    0.15f, -0.15f, -1.0f,  // bottom right
+    -0.15f, -0.15f, -1.0f,  // bottom left
+};
+
 void init() {
     element1.create(vecs);
     element2.create(vecs2);
-    
+    element3.create(vecs3);
     shaders.push_back(new Shader("./player.vec", "./player.frag"));
 }
 void draw() {
@@ -87,12 +83,19 @@ void draw() {
     shaders[0]->setMat4("model", model);
     
     element1.bind();
-    glDrawArrays(GL_TRIANGLES, 0, vecs.size());
+    glDrawArrays(GL_TRIANGLES, 0, vecs.size() / 3);
     glBindVertexArray(0);
+
     shaders[0]->setVec3("bcolor", glm::vec3(0.0f, 1.0f, 0.2f));
     element2.bind();
-    glDrawArrays(GL_TRIANGLES, 0, vecs2.size());
+    glDrawArrays(GL_TRIANGLES, 0, vecs2.size() / 3);
     glBindVertexArray(0);
+
+    shaders[0]->setVec3("bcolor", glm::vec3(0.0f, 0.0f, 1.2f));
+    element3.bind();
+    glDrawArrays(GL_TRIANGLES, 0, vecs3.size() / 3);
+    glBindVertexArray(0);
+
 	glLoadIdentity();
 	glutSwapBuffers();
 } 

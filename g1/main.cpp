@@ -25,8 +25,9 @@ float yp = 0.0f;
 float timer = 60;
 float rotater = 0.0f;
 drawOBJ element1;
-float vertices[] = {
-    -0.5f, -0.5f, -0.5f,
+drawOBJ element2;
+vector<float> vecs = {
+   -0.5f, -0.5f, -0.5f,
      0.5f, -0.5f, -0.5f,
      0.5f,  0.5f, -0.5f,
      0.5f,  0.5f, -0.5f,
@@ -38,21 +39,10 @@ float vertices[] = {
      0.5f,  0.5f,  0.5f,
      0.5f,  0.5f,  0.5f,
     -0.5f,  0.5f,  0.5f,
-    -0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f 
+};
+vector<float> vecs2 = {
 
-    -0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
-    -0.5f, -0.5f,  0.5f,
-    -0.5f,  0.5f,  0.5f,
-
-     0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
 
     -0.5f, -0.5f, -0.5f,
      0.5f, -0.5f, -0.5f,
@@ -69,46 +59,14 @@ float vertices[] = {
     -0.5f,  0.5f, -0.5f,
 };
 void init() {
-/*
-    float vertices[] = {
-         0.5f,  0.5f,    // top right
-         0.5f, -0.5f,   // bottom right
-        -0.5f, -0.5f,    // bottom left
-        -0.5f,  0.5f,     // top left 
-    };
-    */
-
-    /*
-    unsigned int indices[] = {
-        0, 1, 3,   // first triangle
-        1, 2, 3    // second triangle
-    };*/
-
-   element1.set(vertices, sizeof(vertices));
-    unsigned int VBO, VAO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+    element1.create(vecs);
+    element2.create(vecs2);
     
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-   // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0,2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    std::cout << VAO << "-" << VBO << "-" << EBO << "*\n";
     shaders.push_back(new Shader("./player.vec", "./player.frag"));
-
 }
 void draw() {
     glEnable(GL_DEPTH_TEST);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
    
     glm::mat4 pro;
     pro = glm::perspective(glm::radians(45.0f), 1000.0f / 1000.0f, 0.1f, 100.0f);
@@ -123,15 +81,18 @@ void draw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
  
     shaders[0]->use();
-    shaders[0]->setVec3("textColor", glm::vec3(1.0f, 1.0f, 0.2f));
+    shaders[0]->setVec3("bcolor", glm::vec3(1.0f, 1.0f, 0.2f));
     shaders[0]->setMat4("projection", pro);
     shaders[0]->setMat4("view", view);
     shaders[0]->setMat4("model", model);
-
-    //element1.set(vertices, sizeof(vertices));
-
-   // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    
+    element1.bind();
+    glDrawArrays(GL_TRIANGLES, 0, vecs.size());
+    glBindVertexArray(0);
+    shaders[0]->setVec3("bcolor", glm::vec3(0.0f, 1.0f, 0.2f));
+    element2.bind();
+    glDrawArrays(GL_TRIANGLES, 0, vecs2.size());
+    glBindVertexArray(0);
 	glLoadIdentity();
 	glutSwapBuffers();
 } 
@@ -176,3 +137,49 @@ void main(int argc, char** argv) {
 	//start looop
 	glutMainLoop();
 }
+/*
+float vertices[] = {
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+
+    -0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
+
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f, -0.5f,
+
+    -0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f,
+};
+
+*/

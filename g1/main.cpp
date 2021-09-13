@@ -24,6 +24,50 @@ float xp = 0.0f;
 float yp = 0.0f;
 float timer = 60;
 float rotater = 0.0f;
+drawOBJ element1;
+float vertices[] = {
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+
+    -0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
+
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f, -0.5f,
+
+    -0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f,
+};
 void init() {
 /*
     float vertices[] = {
@@ -33,59 +77,19 @@ void init() {
         -0.5f,  0.5f,     // top left 
     };
     */
-    float vertices[] = {
-        -0.5f, -0.5f, -0.5f, 
-         0.5f, -0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
 
-        -0.5f, -0.5f,  0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,
-
-        -0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f, -0.5f, 
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f, 
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-
-        -0.5f, -0.5f, -0.5f, 
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f, -0.5f,  0.5f, 
-        -0.5f, -0.5f,  0.5f,
-        -0.5f, -0.5f, -0.5f, 
-
-        -0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f, 
-        -0.5f,  0.5f, -0.5f,
-    };
     /*
     unsigned int indices[] = {
         0, 1, 3,   // first triangle
         1, 2, 3    // second triangle
     };*/
+
+   element1.set(vertices, sizeof(vertices));
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
-
+    
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -98,18 +102,14 @@ void init() {
     glVertexAttribPointer(0,2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    std::cout << VAO << "-" << VBO << "-" << EBO << "*\n";
     shaders.push_back(new Shader("./player.vec", "./player.frag"));
 
 }
 void draw() {
     glEnable(GL_DEPTH_TEST);
-   // glm::mat4 trans = glm::mat4(1.0f);  
-    //trans = glm::rotate(trans, glm::radians(30.0f), glm::vec3(0.0, 0.0, 1.0));
-   // trans = glm::scale(trans, glm::vec3(1.0, 1.0, 1.0));
-   // trans = glm::rotate(trans, rotater, glm::vec3(1.0f, 1.0f, 0.0f));
-   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    
-    
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+   
     glm::mat4 pro;
     pro = glm::perspective(glm::radians(45.0f), 1000.0f / 1000.0f, 0.1f, 100.0f);
 
@@ -119,7 +119,6 @@ void draw() {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::rotate(model, rotater, glm::vec3(0.5f, 1.0f, 0.0f));
     
-    
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
  
@@ -128,6 +127,8 @@ void draw() {
     shaders[0]->setMat4("projection", pro);
     shaders[0]->setMat4("view", view);
     shaders[0]->setMat4("model", model);
+
+    //element1.set(vertices, sizeof(vertices));
 
    // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -151,8 +152,6 @@ void normalKeysFunc(unsigned char key, int x, int y) {
 
     if (key == '6') { yp += 1; }
     if (key == '3') { yp -= 1; }
-
-
 }
 void main(int argc, char** argv) {
 	glutInit(&argc, argv);

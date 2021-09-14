@@ -13,6 +13,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "stb_image.h"
 #include "shader2.h"
 
 using namespace std;
@@ -24,9 +25,57 @@ float xp = 0.0f;
 float yp = 0.0f;
 float timer = 60;
 float rotater = 0.0f;
+float winsize = 200.0f;
+drawOBJ element0;
 drawOBJ element1;
 drawOBJ element2;
 drawOBJ element3;
+
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+
+vector<float>vecs0 = {
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+
+    -0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
+
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f, -0.5f,
+
+    -0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f,
+};
 vector<float> vecs = {
    -0.5f, -0.5f, -0.5f,
      0.5f, -0.5f, -0.5f,
@@ -55,6 +104,7 @@ vector<float> vecs3 = {
 };
 
 void init() {
+    element0.create(vecs0);
     element1.create(vecs);
     element2.create(vecs2);
     element3.create(vecs3);
@@ -62,10 +112,9 @@ void init() {
 }
 void draw() {
     glEnable(GL_DEPTH_TEST);
-   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-   
+    
     glm::mat4 pro;
-    pro = glm::perspective(glm::radians(45.0f), 1000.0f / 1000.0f, 0.1f, 100.0f);
+    pro = glm::perspective(glm::radians(45.0f), winsize / winsize, 0.1f, 100.0f);
 
     glm::mat4 view = glm::mat4(1.0f);
     view = glm::translate(view, glm::vec3(xp, yp, z));
@@ -82,6 +131,12 @@ void draw() {
     shaders[0]->setMat4("view", view);
     shaders[0]->setMat4("model", model);
     
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    element0.bind();
+    glDrawArrays(GL_TRIANGLES, 0, vecs0.size() / 3);
+    glBindVertexArray(0);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
     element1.bind();
     glDrawArrays(GL_TRIANGLES, 0, vecs.size() / 3);
     glBindVertexArray(0);
@@ -105,7 +160,12 @@ void update(int) {
     //std::cout << rotater << "\n";
 	glutTimerFunc(1000.0 / timer, update, 0);
 }
-void mouseFunc(int button, int state, int x, int y) {}
+void mouseFunc(int button, int state, int x, int y) {
+    std::cout << button << " | " << state << " | " << x << " | " << y << '\n';
+}
+void mouseFuncMove( int x, int y) {
+    std::cout  << x << " | " << y << '\n';
+}
 void normalKeysFunc(unsigned char key, int x, int y) {
     cout << key << "\n";
     if (key == '0') { z += 1; }
@@ -120,17 +180,18 @@ void normalKeysFunc(unsigned char key, int x, int y) {
 void main(int argc, char** argv) {
 	glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-	glutInitWindowSize(1000, 1000);
+	glutInitWindowSize(winsize, winsize);
 	glutInitWindowPosition(0, 0);
 	glutCreateWindow("G1"); 
- 	glViewport(0, 0, 1000, 1000);
+ 	glViewport(0, 0, winsize, winsize);
  
 	glewInit(); 
 	init();
 	//draw
 	glutDisplayFunc(draw);
 	glutIdleFunc(draw);
-	
+
+    glutPassiveMotionFunc(mouseFuncMove);
     glutMouseFunc(mouseFunc);
     glutKeyboardFunc(normalKeysFunc);
 

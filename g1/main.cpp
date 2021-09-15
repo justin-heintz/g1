@@ -13,7 +13,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+
 #include "shader2.h"
 
 using namespace std;
@@ -30,10 +32,10 @@ drawOBJ element0;
 drawOBJ element1;
 drawOBJ element2;
 drawOBJ element3;
-
+drawOBJ element4;
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 
-vector<float>vecs0 = {
+vector<float> vecs0 = {
     -0.5f, -0.5f, -0.5f,
      0.5f, -0.5f, -0.5f,
      0.5f,  0.5f, -0.5f,
@@ -102,13 +104,42 @@ vector<float> vecs3 = {
     0.15f, -0.15f, -1.0f,  // bottom right
     -0.15f, -0.15f, -1.0f,  // bottom left
 };
+vector<float> vtex = {
+     0.5f,  0.5f, 0.0f,   1.0f, 1.0f,   
+     0.5f, -0.5f, 0.0f,   1.0f, 0.0f,  
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,  
+    -0.5f,  0.5f, 0.0f,   0.0f, 1.0f    
+};
+vector<int> attrs = {3,2};
+void createTexture(int* width, int* height, unsigned char* data) {
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, *width, *height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+   
+    stbi_image_free(data);
+}
+void loadImage(char const* filename) {
+    int width, height, channels;
+    unsigned char* data = stbi_load(filename, &width, &height, &channels, 0);
+    createTexture(&width, &height, data);
+}
 
 void init() {
+    char const* filename = "./container.jpg";
+    loadImage(filename);
     element0.create(vecs0);
     element1.create(vecs);
     element2.create(vecs2);
     element3.create(vecs3);
+    element4.create(vtex, attrs);
     shaders.push_back(new Shader("./player.vec", "./player.frag"));
+    shaders.push_back(new Shader("./text.vec", "./text.frag"));
 }
 void draw() {
     glEnable(GL_DEPTH_TEST);
@@ -134,22 +165,33 @@ void draw() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     element0.bind();
     glDrawArrays(GL_TRIANGLES, 0, vecs0.size() / 3);
-    glBindVertexArray(0);
+
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     element1.bind();
     glDrawArrays(GL_TRIANGLES, 0, vecs.size() / 3);
-    glBindVertexArray(0);
+
 
     shaders[0]->setVec3("bcolor", glm::vec3(0.0f, 1.0f, 0.2f));
     element2.bind();
     glDrawArrays(GL_TRIANGLES, 0, vecs2.size() / 3);
-    glBindVertexArray(0);
+
 
     shaders[0]->setVec3("bcolor", glm::vec3(0.0f, 0.0f, 1.2f));
     element3.bind();
     glDrawArrays(GL_TRIANGLES, 0, vecs3.size() / 3);
-    glBindVertexArray(0);
+
+
+
+
+    glBindTexture(GL_TEXTURE_2D, 1);
+    shaders[1]->use();
+    shaders[1]->setMat4("projection", pro);
+    shaders[1]->setMat4("view", view);
+    shaders[1]->setMat4("model", model);
+    element4.bind();
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+   // glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 
 	glLoadIdentity();
 	glutSwapBuffers();
@@ -165,6 +207,8 @@ void mouseFunc(int button, int state, int x, int y) {
 }
 void mouseFuncMove( int x, int y) {
     std::cout  << x << " | " << y << '\n';
+   // xp = x * .1;
+   // yp = y * -.1;
 }
 void normalKeysFunc(unsigned char key, int x, int y) {
     cout << key << "\n";
@@ -179,12 +223,12 @@ void normalKeysFunc(unsigned char key, int x, int y) {
 }
 void main(int argc, char** argv) {
 	glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
 	glutInitWindowSize(winsize, winsize);
 	glutInitWindowPosition(0, 0);
 	glutCreateWindow("G1"); 
  	glViewport(0, 0, winsize, winsize);
- 
+    glEnable(GL_MULTISAMPLE);
 	glewInit(); 
 	init();
 	//draw
@@ -201,49 +245,3 @@ void main(int argc, char** argv) {
 	//start looop
 	glutMainLoop();
 }
-/*
-float vertices[] = {
-    -0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f, -0.5f,
-    -0.5f,  0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
-
-    -0.5f, -0.5f,  0.5f,
-     0.5f, -0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f,  0.5f,
-    -0.5f, -0.5f,  0.5f,
-
-    -0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
-    -0.5f, -0.5f,  0.5f,
-    -0.5f,  0.5f,  0.5f,
-
-     0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
-
-    -0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f,  0.5f,
-     0.5f, -0.5f,  0.5f,
-    -0.5f, -0.5f,  0.5f,
-    -0.5f, -0.5f, -0.5f,
-
-    -0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f, -0.5f,
-};
-
-*/

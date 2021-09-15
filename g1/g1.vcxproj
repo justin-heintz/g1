@@ -153,12 +153,21 @@
     <None Include="packages.config" />
     <None Include="player.frag" />
     <None Include="player.vec" />
+    <None Include="text.frag" />
+    <None Include="text.vec" />
     <None Include="ttf.frag" />
     <None Include="ttf.vec" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="shader2.h" />
     <ClInclude Include="stb_image.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\..\Downloads\container.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="g1.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -30,6 +30,23 @@ public:
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
     }
+    void create(std::vector<float> vertices, std::vector<int> attributes) {
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+        glGenBuffers(1, &EBO);
+        glBindVertexArray(VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+       
+        for (int i = 0, start = 0; i < attributes.size(); i++) {
+            glVertexAttribPointer(i, attributes[i], GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(start * sizeof(float)) );
+            glEnableVertexAttribArray(i);
+            start += attributes[i];
+        }
+
+        glEnableVertexAttribArray(0);
+    }
 };
 
 class Shader {

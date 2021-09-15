@@ -1,4 +1,5 @@
 #pragma once
+
 class drawOBJ {
 public:
     unsigned int VBO, VAO, EBO;

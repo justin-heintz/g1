@@ -105,21 +105,25 @@ vector<float> vecs3 = {
     -0.15f, -0.15f, -1.0f,  // bottom left
 };
 vector<float> vtex = {
-     0.5f,  0.5f, 0.0f,   1.0f, 1.0f,   
-     0.5f, -0.5f, 0.0f,   1.0f, 0.0f,  
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,  
-    -0.5f,  0.5f, 0.0f,   0.0f, 1.0f    
+     0.5f,  0.5f, 0.0f,   0.3f, 0.0f,   
+     0.5f, -0.5f, 0.0f,   0.3f, 0.3f,  
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f
 };
 vector<int> attrs = {3,2};
 void createTexture(int* width, int* height, unsigned char* data) {
     unsigned int texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+   
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, *width, *height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, *width, *height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
    
     stbi_image_free(data);
@@ -131,7 +135,8 @@ void loadImage(char const* filename) {
 }
 
 void init() {
-    char const* filename = "./container.jpg";
+   // char const* filename = "./container.jpg";
+    char const* filename = "./mm.png";
     loadImage(filename);
     element0.create(vecs0);
     element1.create(vecs);
@@ -161,7 +166,7 @@ void draw() {
     shaders[0]->setMat4("projection", pro);
     shaders[0]->setMat4("view", view);
     shaders[0]->setMat4("model", model);
-    
+    /**/
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     element0.bind();
     glDrawArrays(GL_TRIANGLES, 0, vecs0.size() / 3);
@@ -180,18 +185,17 @@ void draw() {
     shaders[0]->setVec3("bcolor", glm::vec3(0.0f, 0.0f, 1.2f));
     element3.bind();
     glDrawArrays(GL_TRIANGLES, 0, vecs3.size() / 3);
-
-
-
-
-    glBindTexture(GL_TEXTURE_2D, 1);
-    shaders[1]->use();
-    shaders[1]->setMat4("projection", pro);
-    shaders[1]->setMat4("view", view);
-    shaders[1]->setMat4("model", model);
-    element4.bind();
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-   // glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+    
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        glBindTexture(GL_TEXTURE_2D, 1);
+        shaders[1]->use();
+        shaders[1]->setMat4("projection", pro);
+        shaders[1]->setMat4("view", view);
+        shaders[1]->setMat4("model", model);
+        element4.bind();
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDisable(GL_BLEND);
 
 	glLoadIdentity();
 	glutSwapBuffers();

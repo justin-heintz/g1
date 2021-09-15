@@ -165,6 +165,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\..\Downloads\container.jpg" />
+    <Image Include="mm.png" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="g1.rc" />

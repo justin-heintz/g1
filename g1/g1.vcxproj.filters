@@ -58,6 +58,9 @@
     <Image Include="..\..\..\..\..\Downloads\container.jpg">
       <Filter>Source Files</Filter>
     </Image>
+    <Image Include="mm.png">
+      <Filter>Source Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="g1.rc">

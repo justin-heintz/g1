@@ -37,7 +37,7 @@ float timer = 60;
 float rotater = 0.0f;
 float winsize = 200.0f;
 
-float a = 0.0,b = 0.0,c = 0.0;
+float a = 0.0, b = 0.0, c = 0.0;
 
 drawOBJ element0;
 drawOBJ element1;
@@ -122,9 +122,13 @@ vector<float> vecs3 = {
     -0.15f, -0.15f, -1.0f,  // bottom left
 };
 vector<float> vtex = {
-     0.5f,  0.5f, 0.0f,   1.0f, 1.0f,
-     0.5f, -0.5f, 0.0f,   1.0f, 0.0f,
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,
+    -0.5f, -0.5f, 0.5f,     1.0f, 1.0f,
+     0.5f, -0.5f, 0.5f,     1.0f, 0.0f,
+     0.5f,  0.5f, 0.5f,     0.0f, 0.0f,
+     
+     0.5f,  0.5f, 0.5f,     0.0f, 0.0f,
+    -0.5f,  0.5f, 0.5f,     1.0f, 0.0f,
+    -0.5f, -0.5f, 0.5f,     1.0f, 1.0f,
 };
 vector<int> attrs = {3,2};
  
@@ -326,16 +330,12 @@ void draw() {
     shaders[1]->use();
     shaders[1]->setMat4("projection", pro);
     shaders[1]->setMat4("view", v2);
-    shaders[1]->setMat4("model", model);
+    //shaders[1]->setMat4("model", model);
 
-
-   // glm::mat4 vv = glm::mat4(1.0f);
-    //vv = glm::vec2(a, b);
-
-    shaders[1]->setVec2("move", glm::vec2(10, b));
+    shaders[1]->setVec2("move", glm::vec2(a, b));
     glBindTexture(GL_TEXTURE_2D, 1);
     element4.bind();
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
     
 
 	glLoadIdentity();

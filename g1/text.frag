@@ -8,5 +8,5 @@ uniform vec2 move;
 
 void main()
 {
-    FragColor = texture(ourTexture, move+TexCoord);
+    FragColor = texture(ourTexture, move + TexCoord);
 }

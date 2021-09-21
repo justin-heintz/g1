@@ -29,7 +29,7 @@ std::map<GLchar, Character> Characters;
 FT_Face face;
 FT_Library ft;
 unsigned int VAOF, VBOF;
- 
+float testMove = 0.0f;
 float z = -3.0f;
 float xp = 0.0f;
 float yp = 0.0f;
@@ -37,15 +37,17 @@ float timer = 60;
 float rotater = 0.0f;
 float winsize = 200.0f;
 
+float a = 0.0,b = 0.0,c = 0.0;
+
 drawOBJ element0;
 drawOBJ element1;
 drawOBJ element2;
 drawOBJ element3;
 drawOBJ element4;
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+//glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::mat4 pro = glm::perspective(glm::radians(45.0f), winsize / winsize, 0.1f, 100.0f);
-glm::mat4 projection = glm::ortho(0.0f, 200.0f, 0.0f, 200.0f);
+//glm::mat4 projection = glm::ortho(0.0f, 200.0f, 0.0f, 200.0f);
 
 unsigned int texture;
 unsigned int fonttexture;
@@ -213,7 +215,7 @@ void init() {
 void RenderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color) {
     // activate corresponding render state	
     s.use();
-    s.setMat4("projection", projection);
+    s.setMat4("projection", pro);
     glUniform3f(glGetUniformLocation(s.ID, "textColor"), color.x, color.y, color.z);
     //glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAOF);
@@ -255,27 +257,25 @@ void RenderText(Shader& s, std::string text, float x, float y, float scale, glm:
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 void draw() {
-   
     glEnable(GL_DEPTH_TEST);
- 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
 
     glm::mat4 view = glm::mat4(1.0f);
     view = glm::translate(view, glm::vec3(xp, yp, z));
+
+    glm::mat4 v2 = glm::mat4(1.0f);
+    v2 = glm::translate(v2, glm::vec3(testMove, 0, -3));
+
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::rotate(model, rotater, glm::vec3(0.5f, 1.0f, 0.0f));
-
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     shaders[0]->use();
     shaders[0]->setVec3("bcolor", glm::vec3(1.0f, 1.0f, 0.2f));
     shaders[0]->setMat4("projection", pro);
     shaders[0]->setMat4("view", view);
     shaders[0]->setMat4("model", model);
-
+    
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     element0.bind();
     glDrawArrays(GL_TRIANGLES, 0, vecs0.size() / 3);
@@ -324,6 +324,15 @@ void draw() {
     glDisable(GL_BLEND);
 
     shaders[1]->use();
+    shaders[1]->setMat4("projection", pro);
+    shaders[1]->setMat4("view", v2);
+    shaders[1]->setMat4("model", model);
+
+
+   // glm::mat4 vv = glm::mat4(1.0f);
+    //vv = glm::vec2(a, b);
+
+    shaders[1]->setVec2("move", glm::vec2(10, b));
     glBindTexture(GL_TEXTURE_2D, 1);
     element4.bind();
     glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -335,6 +344,10 @@ void draw() {
 void update(int) {
 	glutPostRedisplay();
     rotater += 0.05f;
+   // testMove += 0.001f;
+    a += 0.001;
+    b += 0.001;
+    c += 0.001;
     //std::cout << rotater << "\n";
 	glutTimerFunc(1000.0 / timer, update, 0);
 }

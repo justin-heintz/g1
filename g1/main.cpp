@@ -219,7 +219,7 @@ void init() {
 void RenderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color) {
     // activate corresponding render state	
     s.use();
-    s.setMat4("projection", pro);
+   // s.setMat4("projection", pro);
     glUniform3f(glGetUniformLocation(s.ID, "textColor"), color.x, color.y, color.z);
     //glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAOF);

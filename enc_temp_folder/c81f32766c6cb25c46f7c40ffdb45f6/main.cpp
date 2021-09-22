@@ -40,7 +40,15 @@ float winsize = 200.0f;
 float a = 0.0, b = 0.0, c = 0.0;
 
 
+const float radius = 10.0f;
+ 
+glm::mat4 viewt;
+viewt = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+viewt = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 
 
@@ -357,7 +365,7 @@ void update(int) {
 	glutTimerFunc(1000.0 / timer, update, 0);
 }
 void mouseFunc(int button, int state, int x, int y) {
-    //std::cout << button << " | " << state << " | " << x << " | " << y << '\n';
+    std::cout << button << " | " << state << " | " << x << " | " << y << '\n';
 }
 void mouseFuncMove( int x, int y) {
     std::cout  << x << " | " << y << '\n';
@@ -375,11 +383,17 @@ void normalKeysFunc(unsigned char key, int x, int y) {
     if (key == '6') { yp += 1; }
     if (key == '3') { yp -= 1; }
 
-    if (key == 'w'){}
-    if (key == 's'){}
-    if (key == 'a'){}
-    if (key == 'd'){}
-       
+
+
+    const float cameraSpeed = 0.05f; // adjust accordingly
+    if (key == 'w')
+        cameraPos += cameraSpeed * cameraFront;
+    if (key == 's')
+        cameraPos -= cameraSpeed * cameraFront;
+    if (key == 'a')
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    if (key == 'd')
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 
 }
 void main(int argc, char** argv) {

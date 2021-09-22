@@ -59,7 +59,7 @@ vector<float> vecs0 = {
      0.5f,  0.5f, -0.5f,
     -0.5f,  0.5f, -0.5f,
     -0.5f, -0.5f, -0.5f,
-
+    /*
     -0.5f, -0.5f,  0.5f,
      0.5f, -0.5f,  0.5f,
      0.5f,  0.5f,  0.5f,
@@ -94,6 +94,7 @@ vector<float> vecs0 = {
      0.5f,  0.5f,  0.5f,
     -0.5f,  0.5f,  0.5f,
     -0.5f,  0.5f, -0.5f,
+    */
 };
 vector<float> vecs = {
    -0.5f, -0.5f, -0.5f,
@@ -128,7 +129,7 @@ vector<float> vtex = {
     -0.5f,  0.5f, 0.0f,  0.0f, 1.0f,// top left 
 };
 vector<int> attrs = {3,2};
-vector<int> ind = { 0, 1, 3, 1, 2, 3 };
+vector<int> indices = { 0, 1, 3, 1, 2, 3 };
 vector<int> emptyInt = {};
 
 void init() {
@@ -208,7 +209,7 @@ void init() {
     element1.create(vecs, { 3 }, emptyInt);
     element2.create(vecs2, { 3 }, emptyInt);
     element3.create(vecs3, { 3 }, emptyInt);
-    element4.create(vtex, attrs, ind);
+    element4.create(vtex, attrs, indices);
 
     shaders.push_back(new Shader("./player.vec", "./player.frag"));
     shaders.push_back(new Shader("./text.vec", "./text.frag"));
@@ -272,38 +273,32 @@ void draw() {
     model = glm::rotate(model, rotater, glm::vec3(0.5f, 1.0f, 0.0f));
 
     shaders[0]->use();
-    shaders[0]->setVec3("bcolor", glm::vec3(1.0f, 1.0f, 0.2f));
     shaders[0]->setMat4("projection", pro);
     shaders[0]->setMat4("view", view);
     shaders[0]->setMat4("model", model);
-    
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    shaders[0]->setVec3("bcolor", glm::vec3(240.0f, 56.0f, 0.2f));
     element0.bind();
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    element0.draw();
+
+    shaders[0]->setVec3("bcolor", glm::vec3(240.0f, 240.0f, 240.0f));
     element1.bind();
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    shaders[0]->setVec3("bcolor", glm::vec3(0.0f, 1.0f, 0.2f));
+    element1.draw();
+
+    shaders[0]->setVec3("bcolor", glm::vec3(255.5f, 0.5f, 255.5f));
     element2.bind();
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    shaders[0]->setVec3("bcolor", glm::vec3(1.0f, 1.0f, 1.0f));
+    element2.draw();
+
+    shaders[0]->setVec3("bcolor", glm::vec3(0.0f, 147.0f, 1.0f));
     element3.bind();
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    element3.draw();
+
    
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     
     RenderText(*shaders[2], "~", 0.9f,  0.9f, 0.009f, glm::vec3(1.0f, 0.0f, 0.0f));
-    RenderText(*shaders[2], "+", 0.5f, 0.9f, 0.009f, glm::vec3(1.0f, 0.0f, 0.0f));
-    RenderText(*shaders[2], "_", 0.0f, 0.9f, 0.009f, glm::vec3(1.0f, 0.0f, 0.0f));
-    RenderText(*shaders[2], "=", -0.5f, 0.9f, 0.009f, glm::vec3(1.0f, 0.0f, 0.0f));
-    RenderText(*shaders[2], "-", -1.0f, 0.9f, 0.009f, glm::vec3(1.0f, 0.0f, 0.0f));
-     
-    RenderText(*shaders[2], ")", 0.9f, 0.0f, 0.009f, glm::vec3(1.0f, 1.0f, 1.0f));
-    RenderText(*shaders[2], "(", 0.5f, 0.0f, 0.009f, glm::vec3(1.0f, 1.0f, 1.0f));
-    RenderText(*shaders[2], "*", 0.0f, 0.0f, 0.009f, glm::vec3(1.0f, 1.0f, 1.0f));
-    RenderText(*shaders[2], "&", -0.5f, 0.0f, 0.009f, glm::vec3(1.0f, 1.0f, 1.0f));
-    RenderText(*shaders[2], "^", -1.0f, 0.0f, 0.009f, glm::vec3(1.0f, 1.0f, 1.0f));
+
 
     std::string strx = std::to_string(xp);
     strx.resize(5);
@@ -316,11 +311,6 @@ void draw() {
     RenderText(*shaders[2], "y: " + stry,-1.0f, -0.4f, 0.009f, glm::vec3(1.0f, 1.0f, 1.0f));
     RenderText(*shaders[2], "z: " + strz, -1.0f, -0.5f, 0.009f, glm::vec3(1.0f, 1.0f, 1.0f));
 
-    RenderText(*shaders[2], "%", 0.9f, -1.0f, 0.009f, glm::vec3(1.0f, 1.0f, 0.0f));
-    RenderText(*shaders[2], "$", 0.5f, -1.0f, 0.009f, glm::vec3(1.0f, 1.0f, 0.0f));
-    RenderText(*shaders[2], "#", 0.0f, -1.0f, 0.009f, glm::vec3(1.0f, 1.0f, 0.0f));
-    RenderText(*shaders[2], "@", -0.5f, -1.0f, 0.009f, glm::vec3(1.0f, 1.0f, 0.0f));
-    RenderText(*shaders[2], "!", -1.0f, -1.0f, 0.009f, glm::vec3(1.0f, 1.0f, 0.0f));
     
     shaders[1]->use();
     shaders[1]->setMat4("projection", pro);
@@ -330,9 +320,7 @@ void draw() {
     shaders[1]->setVec2("move", glm::vec2(a, b));
     glBindTexture(GL_TEXTURE_2D, 1);
     element4.bind();
-    //glDrawArrays(GL_TRIANGLES, 0, 6);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
+    element4.draw();
     glDisable(GL_BLEND);
 
 	glLoadIdentity();

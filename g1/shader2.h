@@ -3,18 +3,31 @@
 class drawOBJ {
 public:
     unsigned int VBO, VAO, EBO;
-
+    std::vector<float> vert;
+    std::vector<int> attr;
+    std::vector<int> ind;
+    bool dynamic = false;
     void bind() {
         glBindVertexArray(0);
         glBindVertexArray(VAO);
     }
-    void create(std::vector<float> vertices, std::vector<int> attributes, std::vector<int> ind ) {
+    void create(std::vector<float> vertices, std::vector<int> attributes, std::vector<int> indices) {
+        vert = vertices;
+        attr = attributes;
+        ind = indices;
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         glGenBuffers(1, &EBO);
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+
+        if (!dynamic) {
+            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+        }else {
+            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW); 
+        }
+        
+
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         
         if (attributes.size() != 0) {
@@ -26,12 +39,27 @@ public:
             }
         }
 
-        if (ind.size() != 0) {
+        if (indices.size() != 0) {
             std::cout << "HERE2\n";
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, ind.size() * sizeof(float), ind.data(), GL_STATIC_DRAW);
+            if (!dynamic) {
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(float), indices.data(), GL_STATIC_DRAW);
+            }
+            else {
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(float), indices.data(), GL_DYNAMIC_DRAW);
+            }
+           
         }
 
         glEnableVertexAttribArray(0);
+    }
+   
+    void draw() {
+        if (ind.size() == 0) {
+            //https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glDrawArrays.xhtml
+            glDrawArrays(GL_TRIANGLES, 0, vert.size() );// glDrawArrays(GLenum mode, GLint first, GLsizei count);
+        }else{
+            glDrawElements(GL_TRIANGLES, vert.size()  , GL_UNSIGNED_INT, 0);
+        }
     }
 };
 struct Character {

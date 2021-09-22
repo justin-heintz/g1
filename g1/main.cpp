@@ -39,11 +39,6 @@ float winsize = 200.0f;
 
 float a = 0.0, b = 0.0, c = 0.0;
 
-
-
-
-
-
 drawOBJ element0;
 drawOBJ element1;
 drawOBJ element2;
@@ -127,16 +122,15 @@ vector<float> vecs3 = {
     -0.15f, -0.15f, -1.0f,  // bottom left
 };
 vector<float> vtex = {
-    -0.5f, -0.5f, 0.5f,     1.0f, 1.0f,
-     0.5f, -0.5f, 0.5f,     1.0f, 0.0f,
-     0.5f,  0.5f, 0.5f,     0.0f, 0.0f,
-     
-     0.5f,  0.5f, 0.5f,     0.0f, 0.0f,
-    -0.5f,  0.5f, 0.5f,     1.0f, 0.0f,
-    -0.5f, -0.5f, 0.5f,     1.0f, 1.0f,
+     0.5f,  0.5f, 0.0f,  1.0f, 1.0f,// top right
+     0.5f, -0.5f, 0.0f,  1.0f, 0.0f,// bottom right
+    -0.5f, -0.5f, 0.0f,  0.0f, 0.0f,// bottom left
+    -0.5f,  0.5f, 0.0f,  0.0f, 1.0f,// top left 
 };
 vector<int> attrs = {3,2};
- 
+vector<int> ind = { 0, 1, 3, 1, 2, 3 };
+vector<int> emptyInt = {};
+
 void init() {
     /*start texture*/
     int width, height, nrChannels;
@@ -210,11 +204,11 @@ void init() {
 
     /*end font*/
  
-    element0.create(vecs0);
-    element1.create(vecs);
-    element2.create(vecs2);
-    element3.create(vecs3);
-    element4.create(vtex, attrs);
+    element0.create(vecs0, { 3 }, emptyInt);
+    element1.create(vecs, { 3 }, emptyInt);
+    element2.create(vecs2, { 3 }, emptyInt);
+    element3.create(vecs3, { 3 }, emptyInt);
+    element4.create(vtex, attrs, ind);
 
     shaders.push_back(new Shader("./player.vec", "./player.frag"));
     shaders.push_back(new Shader("./text.vec", "./text.frag"));
@@ -272,10 +266,8 @@ void draw() {
 
     glm::mat4 view = glm::mat4(1.0f);
     view = glm::translate(view, glm::vec3(xp, yp, z));
-
     glm::mat4 v2 = glm::mat4(1.0f);
     v2 = glm::translate(v2, glm::vec3(testMove, 0, -3));
-
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::rotate(model, rotater, glm::vec3(0.5f, 1.0f, 0.0f));
 
@@ -287,17 +279,17 @@ void draw() {
     
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     element0.bind();
-    glDrawArrays(GL_TRIANGLES, 0, vecs0.size() / 3);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     element1.bind();
-    glDrawArrays(GL_TRIANGLES, 0, vecs.size() / 3);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     shaders[0]->setVec3("bcolor", glm::vec3(0.0f, 1.0f, 0.2f));
     element2.bind();
-    glDrawArrays(GL_TRIANGLES, 0, vecs2.size() / 3);
-    shaders[0]->setVec3("bcolor", glm::vec3(0.0f, 0.0f, 1.2f));
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    shaders[0]->setVec3("bcolor", glm::vec3(1.0f, 1.0f, 1.0f));
     element3.bind();
-    glDrawArrays(GL_TRIANGLES, 0, vecs3.size() / 3);
-    
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+   
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     
@@ -330,8 +322,6 @@ void draw() {
     RenderText(*shaders[2], "@", -0.5f, -1.0f, 0.009f, glm::vec3(1.0f, 1.0f, 0.0f));
     RenderText(*shaders[2], "!", -1.0f, -1.0f, 0.009f, glm::vec3(1.0f, 1.0f, 0.0f));
     
-    
-
     shaders[1]->use();
     shaders[1]->setMat4("projection", pro);
     shaders[1]->setMat4("view", v2);
@@ -340,7 +330,9 @@ void draw() {
     shaders[1]->setVec2("move", glm::vec2(a, b));
     glBindTexture(GL_TEXTURE_2D, 1);
     element4.bind();
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    //glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
     glDisable(GL_BLEND);
 
 	glLoadIdentity();
@@ -360,7 +352,7 @@ void mouseFunc(int button, int state, int x, int y) {
     //std::cout << button << " | " << state << " | " << x << " | " << y << '\n';
 }
 void mouseFuncMove( int x, int y) {
-    std::cout  << x << " | " << y << '\n';
+   // std::cout  << x << " | " << y << '\n';
    // xp = x * .1;
    // yp = y * -.1;
 }

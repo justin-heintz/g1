@@ -8,7 +8,7 @@ public:
         glBindVertexArray(0);
         glBindVertexArray(VAO);
     }
-    void create(std::vector<float> vertices, std::vector<unsigned int> indices) {
+    void create(std::vector<float> vertices, std::vector<int> attributes, std::vector<int> ind ) {
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         glGenBuffers(1, &EBO);
@@ -16,35 +16,21 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(float), indices.data(), GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-    }
-    void create(std::vector<float> vertices) {
-        glGenVertexArrays(1, &VAO);
-        glGenBuffers(1, &VBO);
-        glGenBuffers(1, &EBO);
-        glBindVertexArray(VAO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-    }
-    void create(std::vector<float> vertices, std::vector<int> attributes) {
-        glGenVertexArrays(1, &VAO);
-        glGenBuffers(1, &VBO);
-        glGenBuffers(1, &EBO);
-        glBindVertexArray(VAO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-       
-        for (int i = 0, start = 0; i < attributes.size(); i++) {
-            glVertexAttribPointer(i, attributes[i], GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(start * sizeof(float)) );
-            glEnableVertexAttribArray(i);
-            start += attributes[i];
+        
+        if (attributes.size() != 0) {
+            std::cout << "HERE1\n";
+            for (int i = 0, start = 0; i < attributes.size(); i++) {
+                glVertexAttribPointer(i, attributes[i], GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(start * sizeof(float)));
+                glEnableVertexAttribArray(i);
+                start += attributes[i];
+            }
         }
+
+        if (ind.size() != 0) {
+            std::cout << "HERE2\n";
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, ind.size() * sizeof(float), ind.data(), GL_STATIC_DRAW);
+        }
+
         glEnableVertexAttribArray(0);
     }
 };
